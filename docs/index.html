@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filmed Up — The Reel Hunt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #100E14;
+    --bg-panel: #1A1721;
+    --bg-panel-raised: #221D2C;
+    --gold: #E8B34D;
+    --gold-dim: #8A6A2F;
+    --red: #C1443A;
+    --paper: #F3EFE6;
+    --paper-dim: #B7B1A6;
+    --sprocket: #0A090D;
+    --font-display: 'Oswald', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    min-height:100vh;
+    background: var(--bg);
+    color: var(--paper);
+    font-family: var(--font-body);
+  }
+
+  body{
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(232,179,77,0.08), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, transparent 1px, transparent 2px);
+    display:flex;
+    justify-content:center;
+    padding: 0 28px 64px;
+  }
+
+  .film-rail{
+    position: fixed;
+    top:0; bottom:0;
+    width: 34px;
+    background: var(--sprocket);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-evenly;
+    z-index: 5;
+  }
+  .film-rail.left{ left:0; }
+  .film-rail.right{ right:0; }
+  .film-rail span{
+    width:14px; height:20px;
+    border-radius:4px;
+    background: var(--bg);
+  }
+  @media (max-width: 640px){
+    .film-rail{ display:none; }
+    body{ padding: 0 16px 48px; }
+  }
+
+  .marquee{
+    width:100%;
+    max-width: 640px;
+    margin-top: 40px;
+    text-align:center;
+  }
+
+  .marquee-lights{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .marquee-lights span{
+    width:7px; height:7px;
+    border-radius:50%;
+    background: var(--gold-dim);
+    animation: bulb 2.4s infinite ease-in-out;
+  }
+  .marquee-lights span:nth-child(odd){ animation-delay: 1.2s; }
+  @keyframes bulb{
+    0%, 40%, 100% { background: var(--gold-dim); box-shadow:none; }
+    20% { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  }
+
+  h1.title{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.4rem, 8vw, 3.6rem);
+    letter-spacing: 0.03em;
+    margin: 0;
+    color: var(--paper);
+    text-shadow: 0 0 24px rgba(232,179,77,0.25);
+  }
+  .subtitle{
+    font-family: var(--font-body);
+    color: var(--paper-dim);
+    font-size: 0.95rem;
+    margin-top: 8px;
+  }
+
+  main{
+    width:100%;
+    max-width: 520px;
+    margin-top: 44px;
+  }
+
+  .reel-status{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 14px;
+    font-family: var(--font-display);
+    color: var(--gold);
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+  }
+  .reel-status .frames{
+    display:flex;
+    gap:6px;
+  }
+  .reel-status .frames i{
+    width:8px; height:8px;
+    border-radius:2px;
+    background: rgba(255,255,255,0.12);
+    display:inline-block;
+  }
+  .reel-status .frames i.done{ background: var(--gold); }
+
+  .ticket{
+    position: relative;
+    background: var(--bg-panel);
+    border-radius: 10px;
+    padding: 36px 32px 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute;
+    width:26px; height:26px;
+    background: var(--bg);
+    border-radius:50%;
+    top:50%;
+    transform: translateY(-50%);
+  }
+  .ticket::before{ left:-13px; }
+  .ticket::after{ right:-13px; }
+
+  .clue-label{
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    color: var(--paper-dim);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 10px;
+  }
+
+  .clue-text{
+    font-size: 1.15rem;
+    line-height: 1.5;
+    color: var(--paper);
+    margin-bottom: 26px;
+    min-height: 3.4em;
+  }
+
+  form{
+    display:flex;
+    gap:10px;
+    flex-wrap: wrap;
+  }
+
+  input[type="text"]{
+    flex: 1 1 220px;
+    background: var(--bg);
+    border: 1.5px solid rgba(255,255,255,0.14);
+    border-radius: 6px;
+    padding: 14px 16px;
+    color: var(--paper);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  input[type="text"]::placeholder{
+    color: var(--paper-dim);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  input[type="text"]:focus{
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(232,179,77,0.2);
+  }
+
+  button{
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    background: var(--gold);
+    color: #1A1400;
+    border: none;
+    border-radius: 6px;
+    padding: 14px 26px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  button:hover{ background: #f0c069; }
+  button:active{ transform: scale(0.98); }
+
+  .message{
+    margin-top: 16px;
+    font-size: 0.92rem;
+    min-height: 1.4em;
+  }
+  .message.error{ color: var(--red); }
+  .message.success{ color: var(--gold); }
+
+  .ticket.shake{ animation: shake 0.4s; }
+  @keyframes shake{
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-8px); }
+    40%, 60% { transform: translateX(8px); }
+  }
+
+  .admin-link{
+    display:block;
+    text-align:center;
+    margin-top: 28px;
+    color: var(--paper-dim);
+    font-size: 0.78rem;
+    text-decoration: none;
+  }
+  .admin-link:hover{ color: var(--gold); }
+
+  /* Win screen */
+  .win-screen{
+    text-align:center;
+    padding: 20px 10px 0;
+  }
+  .win-screen .the-end{
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 10vw, 4rem);
+    color: var(--gold);
+    margin: 0 0 10px;
+    text-shadow: 0 0 30px rgba(232,179,77,0.4);
+  }
+  .win-screen p{
+    color: var(--paper-dim);
+    max-width: 420px;
+    margin: 0 auto 26px;
+    line-height: 1.5;
+  }
+  .reset-btn{
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    cursor: pointer;
+  }
+  .reset-btn:hover{ background: rgba(232,179,77,0.1); }
+
+  .hidden{ display:none !important; }
+
+  button:disabled{ opacity: 0.6; cursor: default; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  /* ---- Responsive tightening for phones ---- */
+  @media (max-width: 480px){
+    .marquee{ margin-top: 24px; }
+    .marquee-lights{ gap: 7px; margin-bottom: 14px; }
+    .marquee-lights span{ width:6px; height:6px; }
+    h1.title{ letter-spacing: 0.02em; }
+    main{ margin-top: 28px; }
+    .ticket{ padding: 26px 20px 22px; border-radius: 8px; }
+    .ticket::before, .ticket::after{ display:none; }
+    .clue-text{ font-size: 1.05rem; margin-bottom: 20px; min-height: 0; }
+    form{ flex-direction: column; }
+    input[type="text"]{ width:100%; font-size: 16px; padding: 14px 14px; }
+    button{ width:100%; padding: 14px 20px; min-height: 48px; }
+    .reel-status{ font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="film-rail left" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+<div class="film-rail right" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<div class="marquee">
+  <div class="marquee-lights" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <h1 class="title">FILMED UP</h1>
+  <p class="subtitle">Find the code. Crack the reel. Roll on.</p>
+</div>
+
+<main>
+  <div id="game-view">
+    <div class="reel-status">
+      <span id="reel-label">Reel 1 of 10</span>
+      <span class="frames" id="frames" aria-hidden="true"></span>
+    </div>
+
+    <div class="ticket" id="ticket">
+      <div class="clue-label">Your next clue</div>
+      <div class="clue-text" id="clue-text">Loading...</div>
+
+      <form id="code-form">
+        <input type="text" id="code-input" placeholder="Enter code" autocomplete="off" autocapitalize="characters" aria-label="Enter the code you found">
+        <button type="submit">Submit</button>
+      </form>
+
+      <div class="message" id="message" role="status" aria-live="polite"></div>
+    </div>
+
+    <a href="#" class="admin-link" id="reset-link">Restart the hunt</a>
+  </div>
+
+  <div id="win-view" class="win-screen hidden">
+    <div class="the-end">THE END</div>
+    <p>You found every code and made it through all 10 reels. Roll credits — the hunt is yours.</p>
+    <button class="reset-btn" id="reset-btn">Play again</button>
+  </div>
+</main>
+
+<script>
+
+  const CHALLENGES = [
+    { clue: "Placeholder clue 1: describe where in the app or venue to find the first code.", hash: "3733cd977ff8eb18b987357e22ced99f46097f31ecb239e878ae63760e83e4d5" },
+    { clue: "Placeholder clue 2: describe the next challenge here.", hash: "11defc036611a355b63532821b2187593bf81248d7ebc761e8afcae699c0b715" },
+    { clue: "Placeholder clue 3: describe the next challenge here.", hash: "410de434e0e9d64d9bca4ff536158e4b8e748d224b1feb3eb18bffb170491062" },
+    { clue: "Placeholder clue 4: describe the next challenge here.", hash: "acfa11d9bab465fa50a60c56bd4953761cd8751479fd00c8bdfc2366bb86bca0" },
+    { clue: "Placeholder clue 5: describe the next challenge here.", hash: "25eb6fceb6ebcd735d3f63345fc71b778238d5bc48c495ba9ac4b33837533659" },
+    { clue: "Placeholder clue 6: describe the next challenge here.", hash: "3d2042d6d6a14766ab16727fa6d19316203df8a5cc131f56f140b71df19474e7" },
+    { clue: "Placeholder clue 7: describe the next challenge here.", hash: "e97054414e36bd88e09c592da719661ed754b5e23859eb018b8c62bdd3f710d7" },
+    { clue: "Placeholder clue 8: describe the next challenge here.", hash: "a5247b9a4b6cda992e68c1f153a306d213e733f31601b31dbf993169e373cd8a" },
+    { clue: "Placeholder clue 9: describe the next challenge here.", hash: "1fa98c4dcc7db3230362aa617ed5e6e7f35fcf62ef41ef63b29ec7e98f9c2cad" },
+    { clue: "Placeholder clue 10: describe the final challenge here.", hash: "532d8828056b9ae3bc1346fcac5a0a4da065ae9f3ea362a4269433b9af2cd736" },
+  ];
+
+  async function sha256Hex(text){
+    const bytes = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  const STORAGE_KEY = "filmedup_progress";
+
+  const gameView = document.getElementById("game-view");
+  const winView = document.getElementById("win-view");
+  const reelLabel = document.getElementById("reel-label");
+  const framesEl = document.getElementById("frames");
+  const ticket = document.getElementById("ticket");
+  const clueText = document.getElementById("clue-text");
+  const form = document.getElementById("code-form");
+  const input = document.getElementById("code-input");
+  const message = document.getElementById("message");
+  const resetLink = document.getElementById("reset-link");
+  const resetBtn = document.getElementById("reset-btn");
+
+  function loadProgress(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { index: 0 };
+    try {
+      const parsed = JSON.parse(raw);
+      if(typeof parsed.index === "number") return parsed;
+    } catch(e) {}
+    return { index: 0 };
+  }
+
+  function saveProgress(progress){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  }
+
+  let progress = loadProgress();
+
+  function renderFrames(){
+    framesEl.innerHTML = "";
+    for(let i = 0; i < CHALLENGES.length; i++){
+      const dot = document.createElement("i");
+      if(i < progress.index) dot.classList.add("done");
+      framesEl.appendChild(dot);
+    }
+  }
+
+  function render(){
+    if(progress.index >= CHALLENGES.length){
+      gameView.classList.add("hidden");
+      winView.classList.remove("hidden");
+      return;
+    }
+    gameView.classList.remove("hidden");
+    winView.classList.add("hidden");
+    reelLabel.textContent = `Reel ${progress.index + 1} of ${CHALLENGES.length}`;
+    clueText.textContent = CHALLENGES[progress.index].clue;
+    renderFrames();
+    message.textContent = "";
+    message.className = "message";
+    input.value = "";
+    submitBtn.disabled = false;
+  }
+
+  const submitBtn = form.querySelector("button");
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    const guess = input.value.trim().toUpperCase();
+    if(guess.length === 0) return;
+
+    submitBtn.disabled = true;
+
+    const guessHash = await sha256Hex(guess);
+    const answerHash = CHALLENGES[progress.index].hash.trim().toLowerCase();
+
+    if(guessHash === answerHash){
+      progress.index += 1;
+      saveProgress(progress);
+      message.textContent = "Correct. Rolling to the next reel...";
+      message.className = "message success";
+      setTimeout(render, 500);
+    } else {
+      message.textContent = "Wrong code. Check the app and try again.";
+      message.className = "message error";
+      ticket.classList.remove("shake");
+      void ticket.offsetWidth;
+      ticket.classList.add("shake");
+      submitBtn.disabled = false;
+    }
+  });
+
+  function resetGame(){
+    progress = { index: 0 };
+    saveProgress(progress);
+    render();
+  }
+
+  resetLink.addEventListener("click", function(e){
+    e.preventDefault();
+    if(confirm("Restart the hunt from Reel 1?")){
+      resetGame();
+    }
+  });
+
+  resetBtn.addEventListener("click", resetGame);
+
+  render();
+</script>
+
+</body>
+</html>
