@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filmed Up — Hash Generator (local use only)</title>
+<style>
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    max-width: 560px;
+    margin: 60px auto;
+    padding: 0 20px;
+    color: #1a1a1a;
+  }
+  h1{ font-size: 1.4rem; }
+  p{ color: #555; line-height: 1.5; }
+  input, textarea{
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  label{ font-weight: 600; font-size: 0.9rem; }
+  .result{
+    background: #f4f4f4;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-family: monospace;
+    word-break: break-all;
+    font-size: 0.9rem;
+  }
+  button{
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+    background: #222;
+    color: white;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <h1>Hash Generator (keep this file local — don't upload it)</h1>
+  <p>Type one code per line below. Each one gets converted into a SHA-256 hash you can paste into the <code>CHALLENGES</code> list in <code>index.html</code>, so the real codes never appear in your site's source.</p>
+
+  <label for="codes">Codes (one per line)</label>
+  <textarea id="codes" rows="10" placeholder="CODE1
+CODE2
+CODE3"></textarea>
+
+  <button id="generate">Generate hashes</button>
+
+  <div id="output" style="margin-top:20px;"></div>
+
+  <script>
+    async function sha256Hex(text){
+      const bytes = new TextEncoder().encode(text.trim().toUpperCase());
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+          // ---------------------------------------------------------------
+  // EDIT THIS LIST to set your own clues for the event.
+  // "clue" is what the player reads.
+  // "hash" is NOT the code itself — it's a SHA-256 fingerprint of it,
+  // so the real code never appears anywhere in this file's source.
+  //
+  // To get the hash for your own code, open hash-generator.html
+  // (included alongside this file), type the code in, and paste the
+  // hash it gives you here. Do not upload hash-generator.html to your
+  // live site — it's just a local tool for you.
+  //
+  // These placeholder hashes correspond to CODE1 through CODE10, in
+  // case you want to test the flow before swapping in real codes.
+  // ---------------------------------------------------------------
+    }
+
+    document.getElementById("generate").addEventListener("click", async function(){
+      const lines = document.getElementById("codes").value
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+      const output = document.getElementById("output");
+      output.innerHTML = "<p>Generating…</p>";
+
+      const rows = [];
+      for(const code of lines){
+        const hash = await sha256Hex(code);
+        rows.push(`{ clue: "...", hash: "${hash}" },  // code: ${code}`);
+      }
+
+      output.innerHTML = `<label>Paste into CHALLENGES:</label><div class="result">${rows.join("<br>")}</div>`;
+    });
+  </script>
+</body>
+</html>
